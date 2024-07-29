@@ -28,7 +28,8 @@ export default function OAuth() {
                 })
             })
 
-            const data = res.json();
+            const data = await res.json();
+            // console.log(data);
             dispatch(signInSuccess(data));
             navigate('/');
 
