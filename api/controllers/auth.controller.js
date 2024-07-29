@@ -31,10 +31,38 @@ export const signin = async (req,res,next) =>{
         }
         const token = jwt.sign({id : validUser._id} , process.env.JWT_SECRET);
         const {password : pass , ...userInfo} = validUser._doc;
-        res.cookie('access_token_jwt' , token , {httpOnly : true , expires : new Date(Date.now() + 24*60*60)})
+        res.cookie('access_token' , token , {httpOnly : true , expires : new Date(Date.now() + 24*60*60)})
            .status(200).json(userInfo);
     }catch(error){
         next(error);
     }
 }
-    
+
+export const google = async (req,res,next) => {
+    try{
+        const user = await User.findOne({email : req.body.email});
+        if(user){
+            const token = jwt.sign({id : user._id} , process.env.JWT_SECRET);
+            const {password : pass , ...userInfo} = user._doc;
+            res.cookie('access_token' , token , {httpOnly : true , expires : new Date(Date.now() + 24*60*60)})
+            .status(200).json(userInfo);
+        }else{
+            // Generate a 16 digit random password for user -->>
+            const generatedPassword = Math.random().toString().slice(-8) + Math.random().toString().slice(-8);
+            const hashedPassword = bcryptjs.hashSync(generatedPassword , 10);
+            const newUser = new User({
+                username : req.body.name.split(" ").join("").toLowerCase() + Math.random().toString().slice(-4),
+                email : req.body.email,
+                password : hashedPassword,
+                avatar : req.body.photo
+            })
+            await newUser.save();
+            const token = jwt.sign({id : newUserUser._id} , process.env.JWT_SECRET);
+            const {password : pass , ...userInfo} = newUser._doc;
+            res.cookie('access_token' , token , {httpOnly : true , expires : new Date(Date.now() + 24*60*60)})
+            .status(200).json(userInfo);
+        }
+    }catch(error){
+        next(error);
+    }
+}
