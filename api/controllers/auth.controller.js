@@ -31,7 +31,7 @@ export const signin = async (req,res,next) =>{
         }
         const token = jwt.sign({id : validUser._id} , process.env.JWT_SECRET);
         const {password : pass , ...userInfo} = validUser._doc;
-        res.cookie('access_token' , token , {httpOnly : true , expires : new Date(Date.now() + 24*60*60)})
+        res.cookie('access_token' , token , {httpOnly : true })
            .status(200).json(userInfo);
     }catch(error){
         next(error);
@@ -44,7 +44,7 @@ export const google = async (req,res,next) => {
         if(user){
             const token = jwt.sign({id : user._id} , process.env.JWT_SECRET);
             const {password : pass , ...userInfo} = user._doc;
-            res.cookie('access_token' , token , {httpOnly : true , expires : new Date(Date.now() + 24*60*60)})
+            res.cookie('access_token' , token , {httpOnly : true})
             .status(200).json(userInfo);
         }else{
             // Generate a 16 digit random password for user -->>
